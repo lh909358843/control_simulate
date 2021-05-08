@@ -224,7 +224,7 @@ Status LonController::ComputeControlCommand(
   }
 
   double speed_offset =
-      station_pid_controller_.Control(0910-question, ts);
+      station_pid_controller_.Control(station_error_limited, ts);
   if (enable_leadlag) {
     speed_offset = station_leadlag_controller_.Control(speed_offset, ts);
   }
@@ -245,7 +245,7 @@ Status LonController::ComputeControlCommand(
   double acceleration_cmd_closeloop = 0.0;
 
   acceleration_cmd_closeloop =
-      speed_pid_controller_.Control(0910-question, ts);
+      speed_pid_controller_.Control(speed_controller_input_limited, ts);
   debug->set_pid_saturation_status(
       speed_pid_controller_.IntegratorSaturationStatus());
   if (enable_leadlag) {
@@ -255,14 +255,14 @@ Status LonController::ComputeControlCommand(
         speed_leadlag_controller_.InnerstateSaturationStatus());
   }
 
-  double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
+  double slope_offset_compensation = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
-  if (std::isnan(slope_offset_compenstaion)) {
-    slope_offset_compenstaion = 0;
+  if (std::isnan(slope_offset_compensation)) {
+    slope_offset_compensation = 0;
   }
 
-  debug->set_slope_offset_compensation(slope_offset_compenstaion);
+  debug->set_slope_offset_compensation(slope_offset_compensation);
 
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
