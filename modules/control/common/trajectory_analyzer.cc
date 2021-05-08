@@ -67,7 +67,7 @@ TrajectoryAnalyzer::TrajectoryAnalyzer(
 
 PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
                                                     const double y) const {
-  CHECK_GT(trajectory_points_.size(), 0);
+  CHECK_GT(trajectory_points_.size(), 0U);
 
   double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
   size_t index_min = 0;
@@ -116,12 +116,12 @@ void TrajectoryAnalyzer::ToTrajectoryFrame(const double x, const double y,
 
   // the sin of diff angle between vector (cos_ref_theta, sin_ref_theta) and
   // (dx, dy)
-  double cross_rd_nd = (dy) * (sin_ref_theta) - (dx) * (cos_ref_theta);
+  double cross_rd_nd = cos_ref_theta * dy - sin_ref_theta * dx;
   *ptr_d = cross_rd_nd;
 
   // the cos of diff angle between vector (cos_ref_theta, sin_ref_theta) and
   // (dx, dy)
-  double dot_rd_nd = (dy) * (cos_ref_theta) - (dx) * (sin_ref_theta);
+  double dot_rd_nd = dx * cos_ref_theta + dy * sin_ref_theta;
   *ptr_s = ref_point.s() + dot_rd_nd;
 
   double delta_theta = theta - ref_point.theta();
@@ -237,7 +237,7 @@ PathPoint TrajectoryAnalyzer::FindMinDistancePoint(const TrajectoryPoint &p0,
 
 void TrajectoryAnalyzer::TrajectoryTransformToCOM(
     const double rear_to_com_distance) {
-  CHECK_GT(trajectory_points_.size(), 0);
+  CHECK_GT(trajectory_points_.size(), 0U);
   for (size_t i = 0; i < trajectory_points_.size(); ++i) {
     auto com = ComputeCOMPosition(rear_to_com_distance,
                                   trajectory_points_[i].path_point());
